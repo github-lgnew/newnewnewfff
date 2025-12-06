@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#4a90e2" />
+    <title>旅行记账 · 预算规划</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="manifest" href="manifest.json" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- 顶部导航栏 -->
+      <header class="app-header">
+        <div class="app-header__title">
+          <span id="app-title">旅行记账</span>
+          <span id="app-subtitle" class="app-header__subtitle">余额管理</span>
+        </div>
+        <div class="app-header__balance">
+          <span class="balance-label">余额</span>
+          <span id="current-balance" class="balance-amount">¥0.00</span>
+        </div>
+      </header>
+
+      <!-- 底部导航栏 -->
+      <nav class="bottom-nav">
+        <button class="nav-item nav-item--active" data-view="home">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">记账</span>
+        </button>
+        <button class="nav-item" data-view="travel">
+          <span class="nav-icon">✈️</span>
+          <span class="nav-label">旅游</span>
+        </button>
+        <button class="nav-item" data-view="notes">
+          <span class="nav-icon">📝</span>
+          <span class="nav-label">记事本</span>
+        </button>
+        <button class="nav-item" data-view="settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">设置</span>
+        </button>
+      </nav>
+
+      <!-- 主内容区域 -->
+      <main class="app-main">
+        <!-- 记账页面 -->
+        <section id="view-home" class="view view--active">
+          <div class="quick-actions">
+            <button class="action-btn action-btn--income" id="btn-add-income">
+              <span class="action-icon">➕</span>
+              <span>收入</span>
+            </button>
+            <button class="action-btn action-btn--expense" id="btn-add-expense">
+              <span class="action-icon">➖</span>
+              <span>支出</span>
+            </button>
+            <button class="action-btn action-btn--edit-balance" id="btn-edit-balance">
+              <span class="action-icon">💰</span>
+              <span>修改余额</span>
+            </button>
+          </div>
+
+          <div class="record-filter">
+            <button class="filter-btn filter-btn--active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="income">收入</button>
+            <button class="filter-btn" data-filter="expense">支出</button>
+          </div>
+
+          <div class="records-list" id="records-list">
+            <!-- 记录列表将通过JS动态生成 -->
+          </div>
+        </section>
+
+        <!-- 旅游页面 -->
+        <section id="view-travel" class="view">
+          <div class="travel-header">
+            <div class="location-info">
+              <span class="location-label">当前位置：</span>
+              <span id="current-location">正在定位...</span>
+            </div>
+            <button class="btn-refresh-location" id="btn-refresh-location">🔄 刷新</button>
+          </div>
+
+          <div class="travel-mode-selector">
+            <button class="mode-btn mode-btn--active" data-mode="budget">穷游</button>
+            <button class="mode-btn" data-mode="normal">普通游</button>
+            <button class="mode-btn" data-mode="luxury">高端游</button>
+          </div>
+
+          <div class="destinations-container" id="destinations-container">
+            <!-- 目的地列表将通过JS动态生成 -->
+          </div>
+        </section>
+
+        <!-- 记事本页面 -->
+        <section id="view-notes" class="view">
+          <div class="notes-header">
+            <button class="btn-add-note" id="btn-add-note">➕ 新建笔记</button>
+          </div>
+          <div class="notes-list" id="notes-list">
+            <!-- 笔记列表将通过JS动态生成 -->
+          </div>
+        </section>
+
+        <!-- 设置页面 -->
+        <section id="view-settings" class="view">
+          <div class="settings-group">
+            <h3 class="settings-title">数据管理</h3>
+            <button class="settings-item" id="btn-import-records">
+              <span>导入支付记录</span>
+              <span class="settings-hint">微信/支付宝（待开发）</span>
+            </button>
+            <button class="settings-item" id="btn-export-data">
+              <span>导出数据</span>
+              <span class="settings-hint">备份所有数据</span>
+            </button>
+            <button class="settings-item" id="btn-clear-data">
+              <span>清空所有数据</span>
+              <span class="settings-hint settings-hint--danger">谨慎操作</span>
+            </button>
+          </div>
+          <div class="settings-group">
+            <h3 class="settings-title">关于</h3>
+            <div class="settings-item settings-item--info">
+              <span>版本号</span>
+              <span>v1.0.0</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- 添加记录弹窗 -->
+    <div id="modal-add-record" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-record-title">添加记录</h3>
+          <button class="modal-close" id="modal-close-record">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>金额</label>
+            <input type="number" id="input-amount" step="0.01" placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <label>类别</label>
+            <select id="input-category">
+              <option value="">请选择类别</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <input type="text" id="input-note" placeholder="添加备注（可选）" />
+          </div>
+          <div class="form-group">
+            <label>日期</label>
+            <input type="date" id="input-date" />
+          </div>
+          <button class="btn-primary" id="btn-save-record">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 修改余额弹窗 -->
+    <div id="modal-edit-balance" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>修改余额</h3>
+          <button class="modal-close" id="modal-close-balance">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>当前余额</label>
+            <input type="number" id="input-balance" step="0.01" placeholder="0.00" />
+          </div>
+          <button class="btn-primary" id="btn-save-balance">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 添加笔记弹窗 -->
+    <div id="modal-add-note" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>新建笔记</h3>
+          <button class="modal-close" id="modal-close-note">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>标题</label>
+            <input type="text" id="input-note-title" placeholder="笔记标题" />
+          </div>
+          <div class="form-group">
+            <label>内容</label>
+            <textarea id="input-note-content" rows="8" placeholder="写下你的想法..."></textarea>
+          </div>
+          <button class="btn-primary" id="btn-save-note">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
+
